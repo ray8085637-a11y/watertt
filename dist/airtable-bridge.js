@@ -1,13 +1,13 @@
 // airtable-bridge.js
 const AIRTABLE_CONFIG = {
-  apiKey: 'patAVVVZZSzpeJsZK.14af1cfaa9987e374fbefb4c136b0458fdf9809e731cdb20e129155507900795', 
-  baseId: 'appWPars9GqKM5LiS', 
+  apiKey: 'patAVVVZZSzpeJsZK.14af1cfaa9987e374fbefb4c136b0458fdf9809e731cdb20e129155507900795', // 실제 API 키로 교체
+  baseId: 'appWPars9GqKM5LiS', // 실제 Base ID로 교체
   tables: {
     tax_bills: 'tax_bills',
     charging_stations: 'charging_stations',
     user_accounts: 'user_accounts',
     notifications: 'notifications',
-    trash: 'trash',  
+    trash: 'Trash',  // 대문자 T로 수정!
     notification_settings: 'notification_settings',
     email_log: 'email_log',
     api_settings: 'api_settings',
@@ -51,6 +51,7 @@ const AIRTABLE_CONFIG = {
           }];
         }
         
+        // Airtable API 호출 (최대 10개씩 전송)
         const response = await fetch(url, {
           method: 'POST',
           headers: {
@@ -83,14 +84,11 @@ const AIRTABLE_CONFIG = {
             'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`
           }
         });
-        if (response.status === 403) {
-          console.warn(`⚠️ 권한 없음: ${tableName} 테이블 건너뜀`);
-          return [];
-        }
         
         if (!response.ok) {
-          console.error(`Airtable load error for ${tableName}:`, response.status);
-          return [];
+          const error = await response.json();
+          console.error('Airtable load error:', error);
+          return null;
         }
         
         const result = await response.json();
@@ -169,11 +167,7 @@ const AIRTABLE_CONFIG = {
             if (success) {
               console.log(`✅ Airtable 저장 성공: ${key}`);
             } else {
-              console.warn(`⚠️ Airtable 저장 실패: ${key}`);
-            }
-          })
-          .catch(error => {
-              console.error(`❌ Airtable 저장 에러: ${key}`, error);
+              console.error(`❌ Airtable 저장 실패: ${key}`);
             }
           });
       } catch (error) {
@@ -214,5 +208,3 @@ const AIRTABLE_CONFIG = {
   window.airtableAPI = airtableAPI;
   window.AIRTABLE_CONFIG = AIRTABLE_CONFIG;
 })();
-
-
