@@ -1,6 +1,6 @@
 // airtable-bridge.js
 const AIRTABLE_CONFIG = {
-  apiKey: 'patAVVVZZSzpeJsZK.14af1cfaa9987e374fbefb4c136b0458fdf9809e731cdb20e129155507900795', // 보안을 위해 실제 키는 여기에 넣지 마세요
+  apiKey: 'patXr7ny0VfIsz2Uo.d937df857f94373de65368743916ad4d1c9fb745eb846cc4e1b4b4c24a6a0310', // 보안을 위해 실제 키는 여기에 넣지 마세요
   baseId: 'appWPars9GqKM5LiS',
   tables: {
     tax_bills: 'tax_bills',
@@ -243,3 +243,4 @@ const AIRTABLE_CONFIG = {
     window.location.reload();
   };
 })();
+
