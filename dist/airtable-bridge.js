@@ -1,7 +1,7 @@
 // airtable-bridge.js
 const AIRTABLE_CONFIG = {
-  apiKey: 'YOUR_API_KEY_HERE', // 실제 API 키로 교체
-  baseId: 'YOUR_BASE_ID_HERE', // 실제 Base ID로 교체
+  apiKey: 'patAVVVZZSzpeJsZK.14af1cfaa9987e374fbefb4c136b0458fdf9809e731cdb20e129155507900795', // 실제 API 키로 교체
+  baseId: 'appWPars9GqKM5LiS', // 실제 Base ID로 교체
   tables: {
     tax_bills: 'tax_bills',
     charging_stations: 'charging_stations', 
@@ -208,3 +208,4 @@ const AIRTABLE_CONFIG = {
   window.airtableAPI = airtableAPI;
   window.AIRTABLE_CONFIG = AIRTABLE_CONFIG;
 })();
+
