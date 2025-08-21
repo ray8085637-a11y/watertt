@@ -3,9 +3,9 @@ const AIRTABLE_CONFIG = {
   apiKey: 'patXr7ny0VfIsz2Uo.d937df857f94373de65368743916ad4d1c9fb745eb846cc4e1b4b4c24a6a0310', // 보안을 위해 실제 키는 여기에 넣지 마세요
   baseId: 'appWPars9GqKM5LiS',
   tables: {
-    tax_bills: 'tax_bills',
-    charging_stations: 'charging_stations',
-    user_accounts: 'user_accounts',
+    bills: 'bills',
+    stations: 'stations',
+    accounts: 'accounts',
     notifications: 'notifications',
     trash: 'trash',
     notification_settings: 'notification_settings',
@@ -243,4 +243,5 @@ const AIRTABLE_CONFIG = {
     window.location.reload();
   };
 })();
+
 
