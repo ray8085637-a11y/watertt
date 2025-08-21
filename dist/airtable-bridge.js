@@ -7,11 +7,11 @@ const AIRTABLE_CONFIG = {
     charging_stations: 'charging_stations',
     user_accounts: 'user_accounts',
     notifications: 'notifications',
-    trash: 'Trash',  // 대문자 T로 수정!
+    trash: 'trash',
     notification_settings: 'notification_settings',
     email_log: 'email_log',
     api_settings: 'api_settings',
-    system_config: 'Imported%20table'  // 공백을 %20으로 인코딩
+    // system_config: 'Imported%20table' 
   }
 };
 
@@ -208,5 +208,6 @@ const AIRTABLE_CONFIG = {
   window.airtableAPI = airtableAPI;
   window.AIRTABLE_CONFIG = AIRTABLE_CONFIG;
 })();
+
 
 
