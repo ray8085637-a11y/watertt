@@ -176,10 +176,6 @@ const AIRTABLE_CONFIG = {
     }
   };
   
-  // 페이지 로드 시 Airtable에서 데이터 동기화
-  window.addEventListener('DOMContentLoaded', async () => {
-    console.log('🔄 Airtable 데이터 동기화 시작...');
-    
     // 각 테이블에서 데이터 로드 시도
     for (const [key, tableName] of Object.entries(AIRTABLE_CONFIG.tables)) {
       try {
@@ -187,6 +183,7 @@ const AIRTABLE_CONFIG = {
         if (data && data.length > 0) {
           originalSetItem(key, JSON.stringify(data));
           console.log(`✅ ${key} 동기화 완료 (${data.length}개 레코드)`);
+          syncSuccess = true;
         } else {
           console.log(`📭 ${key} 테이블이 비어있음`);
         }
@@ -208,3 +205,4 @@ const AIRTABLE_CONFIG = {
   window.airtableAPI = airtableAPI;
   window.AIRTABLE_CONFIG = AIRTABLE_CONFIG;
 })();
+
