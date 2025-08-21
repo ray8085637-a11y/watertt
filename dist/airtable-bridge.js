@@ -1,7 +1,7 @@
 // airtable-bridge.js
 const AIRTABLE_CONFIG = {
-  apiKey: 'patAVVVZZSzpeJsZK.14af1cfaa9987e374fbefb4c136b0458fdf9809e731cdb20e129155507900795', // 실제 API 키로 교체
-  baseId: 'appWPars9GqKM5LiS', // 실제 Base ID로 교체
+  apiKey: 'YOUR_API_KEY_HERE', // 보안을 위해 실제 키는 여기에 넣지 마세요
+  baseId: 'appWPars9GqKM5LiS',
   tables: {
     tax_bills: 'tax_bills',
     charging_stations: 'charging_stations',
@@ -10,8 +10,7 @@ const AIRTABLE_CONFIG = {
     trash: 'trash',
     notification_settings: 'notification_settings',
     email_log: 'email_log',
-    api_settings: 'api_settings',
-    // system_config: 'Imported%20table' 
+    api_settings: 'api_settings'
   }
 };
 
@@ -21,6 +20,9 @@ const AIRTABLE_CONFIG = {
   const originalSetItem = localStorage.setItem.bind(localStorage);
   const originalGetItem = localStorage.getItem.bind(localStorage);
   
+  // 동기화 상태 확인
+  const SYNC_FLAG = 'airtable_sync_completed';
+  
   // Airtable 헬퍼 함수들
   const airtableAPI = {
     // 데이터 저장
@@ -28,11 +30,10 @@ const AIRTABLE_CONFIG = {
       const url = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${tableName}`;
       
       try {
-        // 데이터를 레코드 형식으로 변환
         let records = [];
         
         if (Array.isArray(data)) {
-          // 배열인 경우 각 항목을 레코드로 변환
+          // 배열인 경우 각 항목을 레코드로 변환 (최대 10개)
           records = data.slice(0, 10).map(item => ({
             fields: {
               ...item,
@@ -51,7 +52,6 @@ const AIRTABLE_CONFIG = {
           }];
         }
         
-        // Airtable API 호출 (최대 10개씩 전송)
         const response = await fetch(url, {
           method: 'POST',
           headers: {
@@ -85,10 +85,15 @@ const AIRTABLE_CONFIG = {
           }
         });
         
+        // 403 에러 처리
+        if (response.status === 403) {
+          console.warn(`⚠️ 권한 없음: ${tableName} 테이블 건너뜀`);
+          return [];
+        }
+        
         if (!response.ok) {
-          const error = await response.json();
-          console.error('Airtable load error:', error);
-          return null;
+          console.error(`Airtable load error for ${tableName}:`, response.status);
+          return [];
         }
         
         const result = await response.json();
@@ -105,8 +110,8 @@ const AIRTABLE_CONFIG = {
         
         return [];
       } catch (error) {
-        console.error('Airtable load error:', error);
-        return null;
+        console.error(`Airtable load error for ${tableName}:`, error);
+        return [];
       }
     },
     
@@ -167,8 +172,11 @@ const AIRTABLE_CONFIG = {
             if (success) {
               console.log(`✅ Airtable 저장 성공: ${key}`);
             } else {
-              console.error(`❌ Airtable 저장 실패: ${key}`);
+              console.warn(`⚠️ Airtable 저장 실패: ${key}`);
             }
+          })
+          .catch(error => {
+            console.error(`❌ Airtable 저장 에러: ${key}`, error);
           });
       } catch (error) {
         console.error('Data parse error:', error);
@@ -176,9 +184,21 @@ const AIRTABLE_CONFIG = {
     }
   };
   
-  // 페이지 로드 시 Airtable에서 데이터 동기화
+  // 페이지 로드 시 Airtable에서 데이터 동기화 (한 번만!)
   window.addEventListener('DOMContentLoaded', async () => {
+    // 이미 동기화했으면 건너뛰기
+    const syncTime = sessionStorage.getItem(SYNC_FLAG);
+    const currentTime = Date.now();
+    
+    // 5분 이내에 동기화했으면 건너뛰기
+    if (syncTime && (currentTime - parseInt(syncTime)) < 5 * 60 * 1000) {
+      console.log('✅ Airtable 최근 동기화됨 - 건너뛰기');
+      return;
+    }
+    
     console.log('🔄 Airtable 데이터 동기화 시작...');
+    
+    let syncSuccess = false;
     
     // 각 테이블에서 데이터 로드 시도
     for (const [key, tableName] of Object.entries(AIRTABLE_CONFIG.tables)) {
@@ -187,6 +207,7 @@ const AIRTABLE_CONFIG = {
         if (data && data.length > 0) {
           originalSetItem(key, JSON.stringify(data));
           console.log(`✅ ${key} 동기화 완료 (${data.length}개 레코드)`);
+          syncSuccess = true;
         } else {
           console.log(`📭 ${key} 테이블이 비어있음`);
         }
@@ -195,19 +216,30 @@ const AIRTABLE_CONFIG = {
       }
     }
     
-    // React 앱이 데이터를 다시 읽도록 트리거
+    // 동기화 완료 표시
+    sessionStorage.setItem(SYNC_FLAG, currentTime.toString());
     console.log('✨ Airtable 동기화 완료!');
     
-    // 로그인 화면이 나타나도록 약간의 지연 후 리로드
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    // 무한 루프 방지: 동기화 후 리로드 제거!
+    // 대신 필요한 경우에만 수동으로 리로드
+    if (syncSuccess && !localStorage.getItem('is_logged_in')) {
+      // 처음 접속 시에만 리로드
+      if (!sessionStorage.getItem('initial_load_done')) {
+        sessionStorage.setItem('initial_load_done', 'true');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    }
   });
   
   // 디버깅용: 전역 함수로 Airtable API 노출
   window.airtableAPI = airtableAPI;
   window.AIRTABLE_CONFIG = AIRTABLE_CONFIG;
+  
+  // 수동 동기화 함수
+  window.syncAirtable = async function() {
+    sessionStorage.removeItem(SYNC_FLAG);
+    window.location.reload();
+  };
 })();
-
-
-
