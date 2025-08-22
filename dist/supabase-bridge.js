@@ -354,6 +354,16 @@ script.onload = function() {
         }
       }
     }
+        const userAccounts = originalGetItem('user_accounts');
+    if (userAccounts) {
+      const users = JSON.parse(userAccounts);
+      if (users && users.length > 0) {
+        // 기본 사용자로 자동 로그인
+        originalSetItem('is_logged_in', 'true');
+        originalSetItem('current_user_id', '1');
+        console.log('🔐 로그인 상태 복원됨');
+      }
+    }
   }
   
   // 페이지 로드 시 동기화
@@ -419,3 +429,4 @@ script.onerror = function() {
   console.error('❌ Supabase 라이브러리 로드 실패!');
 
 };
+
