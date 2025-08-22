@@ -210,12 +210,12 @@ script.onload = function() {
     
     // 특정 키는 로컬에만 저장
     const localOnlyKeys = [
-      'is_logged_in', 
-      'current_user_id', 
       'airtable_synced',
       'supabase_synced',
-      'initial_load_done'
-    ];
+      'initial_load_done',
+      'sb-wmlstgssbtrftukgxupo-auth-token',
+      'sb-wmlstgssbtrftukgxupo-auth-token-code-verifier'
+];
     
     if (localOnlyKeys.includes(key)) {
       console.log(`🔒 ${key}는 로컬에만 저장`);
@@ -417,4 +417,5 @@ script.onload = function() {
 // 스크립트 로드 실패 시
 script.onerror = function() {
   console.error('❌ Supabase 라이브러리 로드 실패!');
+
 };
